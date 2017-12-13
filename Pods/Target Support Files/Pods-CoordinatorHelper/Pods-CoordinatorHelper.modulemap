@@ -1,0 +1,6 @@
+framework module Pods_CoordinatorHelper {
+  umbrella header "Pods-CoordinatorHelper-umbrella.h"
+
+  export *
+  module * { export * }
+}
