@@ -11,13 +11,23 @@ import Files
 
 class ManagerAssemblies {
     let parser = Parser()
-    
-    func operate(coordinator fileC:File, screen fileS:File, withCoordinatorName name:String) {
+
+    let coordinatorAssemblyFile:File
+    let screenAssemblyFile:File
+
+    init(coordinatorAssemblyFile:File, screenAssemblyFile:File) {
+        self.coordinatorAssemblyFile = coordinatorAssemblyFile
+        self.screenAssemblyFile = screenAssemblyFile
+    }
+
+    func addCoordinator(with name:String) {
         let insertedCoordinatorText = coordinatorText(with: name)
         let insertedScreenText = screenText(with: name)
 
-        insert(insertedCoordinatorText, into: fileC)
-        insert(insertedScreenText, into: fileS)
+        insert(insertedCoordinatorText,
+               into: coordinatorAssemblyFile)
+        insert(insertedScreenText,
+               into: screenAssemblyFile)
     }
     
     // MARK: - Private
@@ -25,7 +35,7 @@ class ManagerAssemblies {
         guard
             let content = try? file.readAsString(),
             let index = parser.lastPosition(for: "}", at: content)
-            else { return }
+            else { return}
         
         var newContent = content
         let insertedIndex = content.index(before: index)

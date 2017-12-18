@@ -8,9 +8,10 @@
 
 import Cocoa
 import Files
+import PromiseKit
 
 enum State {
-    case initial, correctStructure, correctCoordinatorName
+    case initial, correctStructure, correctFlowName, flowAddingStart, flowAdding(result: Bool)
 }
 
 class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate, NSTableViewDataSource {
@@ -18,15 +19,20 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
     @IBOutlet weak var tableView: NSTableView!
     @IBOutlet weak var infoView: NSView!
     @IBOutlet weak var correctProjectStructureLabel: NSTextField!
-    @IBOutlet weak var flowDirCreateButton: NSButton!
+    @IBOutlet weak var flowDirFixButton: NSButton!
 
-    @IBOutlet weak var coordinatorAddView: NSView!
-    @IBOutlet weak var coordinatorNameTextField: NSTextField!
-    @IBOutlet weak var coordinatorAddButton: NSButton!
+    @IBOutlet weak var flowAddView: NSView!
+    @IBOutlet weak var flowNameTextField: NSTextField!
+    @IBOutlet weak var flowAddButton: NSButton!
+    
+    @IBOutlet weak var addinFlowResultTextField: NSTextField!
+    @IBOutlet weak var addinFlowIndocator: NSProgressIndicator!
+    @IBOutlet weak var scanninDiskIndocator: NSProgressIndicator!
+
     
     fileprivate let scaner = DiskScaner()
     fileprivate var projects: [Folder] = []
-    fileprivate var dirFlow: Folder?
+    fileprivate var dirAllFlows: Folder?
     fileprivate var coordAssFile: File?
     fileprivate var screenAssFile: File?
     
@@ -39,7 +45,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
         
         tableView.delegate = self
         tableView.dataSource = self
-        coordinatorNameTextField.delegate = self
+        flowNameTextField.delegate = self
         
         reloadProjectList()
     }
@@ -54,23 +60,32 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
     @IBAction func refresh(_ sender: Any) {
         reloadProjectList()
     }
-    
-    @IBAction func addCoordinator(_ sender: NSButton) {
+    @IBAction func fixProjectStructure(_ sender: NSButton) {
+    }
+    @IBAction func addFlow(_ sender: NSButton) {
+        state = .flowAddingStart
+        
+        let flowName = flowNameTextField.stringValue
         guard
+            flowName.count > 0,
+            let allFlowsDir = dirAllFlows,
             let fileC = coordAssFile,
             let fileS = screenAssFile
-            else { return }
+            else { state = .flowAdding(result:false); return }
         
-        let manager = ManagerAssemblies()
-        manager.operate(coordinator: fileC,
-                        screen: fileS,
-                        withCoordinatorName: coordinatorNameTextField.stringValue)
+        let managerAssemblies = ManagerAssemblies(coordinatorAssemblyFile: fileC,
+                                                  screenAssemblyFile: fileS)
+        managerAssemblies.addCoordinator(with:flowName)
+
+        let managerFlows = ManagerFlow(in: allFlowsDir)
+        managerFlows.create(flow: flowName) { state = .flowAdding(result:$0); return }
+        
     }
     
     // MARK: - Private
-    // MARK: analyzing
+    // MARK: Analyzing
     fileprivate func analyseSelected(_ folder:Folder) {
-        self.dirFlow = nil
+        self.dirAllFlows = nil
         self.coordAssFile = nil
         self.screenAssFile = nil
 
@@ -87,51 +102,69 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
         }
         
         state = .correctStructure
-        self.dirFlow = dirFlow
+        self.dirAllFlows = dirFlow
         self.coordAssFile = coordAssFile
         self.screenAssFile = screenAssFile
     }
 
     fileprivate func analyseEntered(_ name:String) {
         guard
-            let isNewName = dirFlow?.subfolders.filter({ $0.name == name }).isEmpty,
+            let isNewName = dirAllFlows?.subfolders.filter({ $0.name == name }).isEmpty,
             isNewName
             else  {
                 state = .correctStructure
                 return
         }
         
-        state = .correctCoordinatorName
+        state = .correctFlowName
     }
-    // MARK: state
+    // MARK: State
     fileprivate func repformState() {
         switch state {
         case .initial:
             setupInitialUI()
         case .correctStructure:
             setupCorrectStructureUI()
-        case .correctCoordinatorName:
-            setupCorrectCoordinatorNameUI()
+        case .correctFlowName:
+            setupCorrectFlowNameUI()
+        case .flowAddingStart:
+            setupFlowAddingStart()
+        case .flowAdding(let result):
+            setupFlowAdding(result)
         }
     }
-
+// MARK: Setup State UI
     fileprivate func setupInitialUI() {
-        correctProjectStructureLabel.isEnabled = false
-        flowDirCreateButton.isEnabled = true
-        coordinatorAddView.isHidden = true
+        correctProjectStructureLabel.stringValue = "incorrect"
+        flowDirFixButton.isEnabled = true
+        flowAddView.isHidden = true
     }
 
     fileprivate func setupCorrectStructureUI() {
         let enable = true
-        correctProjectStructureLabel.isEnabled = true
-        flowDirCreateButton.isEnabled = false
-        coordinatorAddView.isHidden = false
-        coordinatorAddButton.isEnabled = false
-        coordinatorNameTextField.becomeFirstResponder()
+        correctProjectStructureLabel.stringValue = "correct"
+        flowDirFixButton.isEnabled = false
+        flowAddView.isHidden = false
+        flowAddButton.isEnabled = false
+        flowNameTextField.becomeFirstResponder()
     }
     
-    fileprivate func setupCorrectCoordinatorNameUI() {
-        coordinatorAddButton.isEnabled = true
+    fileprivate func setupCorrectFlowNameUI() {
+        flowAddButton.isEnabled = true
+        addinFlowResultTextField.isHidden = true
+        addinFlowIndocator.stopAnimation(nil)
+    }
+    fileprivate func setupFlowAddingStart() {
+        flowAddButton.isEnabled = false
+        addinFlowResultTextField.isHidden = true
+        addinFlowIndocator.startAnimation(nil)
+    }
+    fileprivate func setupFlowAdding(_ result:Bool) {
+        flowAddButton.isEnabled = true
+        addinFlowResultTextField.isHidden = false
+        addinFlowIndocator.stopAnimation(nil)
+
+        addinFlowResultTextField.stringValue = result ? "Success" : "Failure"
     }
 
     // MARK: reload
@@ -145,7 +178,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
     
     // MARK: - NSTextFieldDelegate
     override func controlTextDidChange(_ obj: Notification) {
-        analyseEntered(coordinatorNameTextField.stringValue)
+        analyseEntered(flowNameTextField.stringValue)
     }
     // MARK: - NSTableViewDelegate, NSTableViewDataSource
     internal func numberOfRows(in tableView: NSTableView) -> Int {

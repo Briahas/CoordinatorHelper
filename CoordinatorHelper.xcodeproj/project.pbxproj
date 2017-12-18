@@ -14,6 +14,7 @@
 		9E03C0791FE1247200B436D7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 9E03C0771FE1247200B436D7 /* Main.storyboard */; };
 		9E03C0851FE126BE00B436D7 /* DiskScaner.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E03C0841FE126BE00B436D7 /* DiskScaner.swift */; };
 		9E03C0871FE1ACF700B436D7 /* Extentions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9E03C0861FE1ACF700B436D7 /* Extentions.swift */; };
+		9EBA0C901FE3D2A40007F079 /* ManagerFlow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EBA0C8F1FE3D2A40007F079 /* ManagerFlow.swift */; };
 		9EDBB3611FE2D4760087DECD /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EDBB3601FE2D4760087DECD /* Parser.swift */; };
 		9EDBB3631FE2E1380087DECD /* ManagerAssemblies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EDBB3621FE2E1380087DECD /* ManagerAssemblies.swift */; };
 /* End PBXBuildFile section */
@@ -31,6 +32,7 @@
 		9E03C07B1FE1247200B436D7 /* CoordinatorHelper.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CoordinatorHelper.entitlements; sourceTree = "<group>"; };
 		9E03C0841FE126BE00B436D7 /* DiskScaner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiskScaner.swift; sourceTree = "<group>"; };
 		9E03C0861FE1ACF700B436D7 /* Extentions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extentions.swift; sourceTree = "<group>"; };
+		9EBA0C8F1FE3D2A40007F079 /* ManagerFlow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerFlow.swift; sourceTree = "<group>"; };
 		9EDBB3601FE2D4760087DECD /* Parser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
 		9EDBB3621FE2E1380087DECD /* ManagerAssemblies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerAssemblies.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -103,6 +105,7 @@
 				9E03C0841FE126BE00B436D7 /* DiskScaner.swift */,
 				9EDBB3601FE2D4760087DECD /* Parser.swift */,
 				9EDBB3621FE2E1380087DECD /* ManagerAssemblies.swift */,
+				9EBA0C8F1FE3D2A40007F079 /* ManagerFlow.swift */,
 			);
 			path = Logic;
 			sourceTree = "<group>";
@@ -248,6 +251,7 @@
 				9E03C0721FE1247200B436D7 /* AppDelegate.swift in Sources */,
 				9EDBB3611FE2D4760087DECD /* Parser.swift in Sources */,
 				9EDBB3631FE2E1380087DECD /* ManagerAssemblies.swift in Sources */,
+				9EBA0C901FE3D2A40007F079 /* ManagerFlow.swift in Sources */,
 				9E03C0871FE1ACF700B436D7 /* Extentions.swift in Sources */,
 				9E03C0851FE126BE00B436D7 /* DiskScaner.swift in Sources */,
 			);
