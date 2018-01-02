@@ -10,8 +10,8 @@ import Foundation
 import Files
 import PromiseKit
 
-enum ProjectStructureErrorr : Error {
-    case error(String)
+enum ProjectStructureError : Error {
+    case localError(String)
 }
 
 enum CreateStates {
@@ -23,27 +23,32 @@ class ProjectStructure {
     let projectExt = "xcodeproj"
     let workspaceExt = "xcworkspace"
     let swiftExtension = ".swift"
-    let coordinatorsDirName = "Coordinators"
-    let logicDirName = "Logic"
-    let routerDirName = "Router"
-    let assembliesDirName = "Assemblies"
+    fileprivate let sourceFolderName = "Source"
+    let coordinatorsFolderName = "Coordinators"
+    let logicFolderName = "Logic"
+    let routerFolderName = "Router"
+    let assembliesFolderName = "Assemblies"
+    let baseCoordinatorFolderName = "BaseCoordinator"
     
     let assemblyCoordName = "AssemblyCoordinator"
     let assemblyScreenName = "AssemblyScreen"
+    let coordinatorFileName = "Coordinator"
     let appdelegateName = "AppDelegate"
     
-    let projectDir:Folder
+    fileprivate let mainDir:Folder
 //    var state:CreateStates = .firstDir
-    var projectName = ""
-    
-    init(with projectDir:Folder) throws {
-        self.projectDir = projectDir
+    fileprivate var projectName = ""
+    fileprivate var coordinatorsFolder: Folder?
+    fileprivate var coordAssFile: File?
+    fileprivate var screenAssFile: File?
 
-        let files = projectDir.files.filter {
+    init(with projectDir:Folder) throws {
+        self.mainDir = projectDir
+
+        let files = projectDir.subfolders.filter {
             guard
                 let ext = $0.extension,
-                ext == projectExt,
-                ext == workspaceExt
+                ext == projectExt || ext == workspaceExt
                 else { return false }
             return true
         }
@@ -51,126 +56,61 @@ class ProjectStructure {
         guard
             !files.isEmpty,
             let ff = files.first
-            else { throw ProjectStructureErrorr.error("Not a project folder") }
+            else { throw ProjectStructureError.localError("Not a project folder") }
         
         self.projectName = ff.nameExcludingExtension
     }
 
     // MARK: - Public
-    func create() throws {
-        let firstDir = try projectDir.createSubfolderIfNeeded(withName: projectName)
+    var isCorrect: Bool {
+        guard let _ = try? analyzeWith(creation: false) else { return false }
         
-        let coordDir = try firstDir.createSubfolderIfNeeded(withName: coordinatorsDirName)
-        let logicDir = try firstDir.createSubfolderIfNeeded(withName: logicDirName)
-        
-        let routerDir = try logicDir.createSubfolderIfNeeded(withName: routerDirName)
-        let assembliesDir = try logicDir.createSubfolderIfNeeded(withName: assembliesDirName)
+        return true
+    }
+    
+    func performCorrection() throws {
+        try analyzeWith(creation: true)
+    }
 
-        try assemblyCoordFileCreate(at: assembliesDir)
-        try assemblyScreenFileCreate(at: assembliesDir)
+    func isCorrectCoordinator(_ name:String) -> Bool {
+        guard
+            let parrent = coordinatorsFolder,
+            parrent.containsSubfolder(named: name)
+            else { return true }
         
-        
-        
-//        let result =
-//            mainDirCreate().then { mainDir in
-//                self.logicDirCreate(mainDir).then { logicDir in
-//                    self.routerDirCreate(logicDir)
-//                        .then { routerDir in
-//                            self.routerFileCreate(routerDir)
-//                        }.then { routerDir in
-//                            self.accembliesDirCreate(logicDir)
-//                                .then { accembliesDir in
-//                                    self.assemblyFileCreate(named: self.assemblyCoordName, at: accembliesDir)
-//
-//                                }.then { accembliesDir in
-//                                    self.assemblyFileCreate(named: self.assemblyScreenName, at: accembliesDir)
-//                            }
-//                }
-//        }
-//
-//        return result
+        return false
     }
 
     // MARK: - Private
-//    fileprivate func stateAnalyze() {
-//        switch state {
-//        case .firstDir:
-//            firstDirCreate()
-//        case .coordDir:
-//            ()
-//        case .logicDir:
-//            ()
-//        case .router:
-//            ()
-//        case .assemblies:
-//            ()
-//        }
-//    }
-    
-    fileprivate func mainDirCreate() -> Promise<Folder> {
-        let promise = Promise<Folder> { fulfill, _ in
-            let firstDir = try projectDir.createSubfolderIfNeeded(withName: projectName)
-            fulfill(firstDir)
-        }
+    fileprivate func analyzeWith(creation:Bool) throws {
+        let projectFolder = try mainDir.subfolder(named:projectName, withCreation:creation)
+        let sourceDir = try projectFolder.subfolder(named:sourceFolderName, withCreation:creation)
+        let coordDir = try sourceDir.subfolder(named:coordinatorsFolderName, withCreation:creation)
+        let logicDir = try sourceDir.subfolder(named:logicFolderName, withCreation:creation)
+        let routerDir = try logicDir.subfolder(named:routerFolderName, withCreation:creation)
+        let assembliesDir = try logicDir.subfolder(named:assembliesFolderName, withCreation:creation)
+        let baseCoordinatorDir = try logicDir.subfolder(named:baseCoordinatorFolderName, withCreation:creation)
         
-        return promise
+        let baseCoordinatorFile = try baseCoordinatorDir.file(named: baseCoordinatorFolderName+".swift", withCreation:creation)
+        let protocolCoordinatorFile = try baseCoordinatorDir.file(named: coordinatorFileName+".swift", withCreation:creation)
+
+        let coordAssFile = try assembliesDir.file(named: assemblyCoordName+".swift", withCreation:creation)
+        let screenAssFile = try assembliesDir.file(named: assemblyScreenName+".swift", withCreation:creation)
+
+        self.coordinatorsFolder = coordDir
+        self.coordAssFile = coordAssFile
+        self.screenAssFile = screenAssFile
     }
 
-    fileprivate func logicDirCreate(_ mainDir:Folder) -> Promise<Folder> {
-        let promise = Promise<Folder> { fulfill, error in
-//            let coordDir = try firstDir.createSubfolderIfNeeded(withName: coordinatorsDirName)
-            let logicDir = try mainDir.createSubfolderIfNeeded(withName: logicDirName)
-            fulfill(logicDir)
-        }
-        
-        return promise
-    }
-
-    // MARK: Router
-    fileprivate func routerDirCreate(_ logicDir:Folder) -> Promise<Folder> {
-        let promise = Promise<Folder> { fulfill, error in
-            let routerDir = try logicDir.createSubfolderIfNeeded(withName: routerDirName)
-            fulfill(routerDir)
-        }
-        
-        return promise
-    }
-    
-    fileprivate func routerFileCreate(_ routerDir:Folder) -> Promise<File> {
-        let promise = Promise<File> { fulfill, error in
-            let routerFileName = routerDirName + swiftExtension
-            let routerFile = try routerDir.createFileIfNeeded(withName: routerFileName)
-            fulfill(routerFile)
-        }
-        
-        return promise
-    }
-    
     // MARK: Assemblies
-    fileprivate func accembliesDirCreate(_ logicDir:Folder) -> Promise<Folder> {
-        let promise = Promise<Folder> { fulfill, error in
-            let assembliesDir = try logicDir.createSubfolderIfNeeded(withName: assembliesDirName)
-            fulfill(assembliesDir)
-        }
-        
-        return promise
-    }
-
-    fileprivate func assemblyScreenFileCreate(at assembliesDir:Folder) throws {
-        let file = try assemblyFileCreate(named: assemblyScreenName, at: assembliesDir)
-        
+    fileprivate func assemblyScreenFileCreate() throws {
+        guard let file = screenAssFile else { throw ProjectStructureError.localError("No FiLE \(screenAssFile?.name) 0_0???") }
         TextFunc.insert("1111", into: file)
     }
 
     fileprivate func assemblyCoordFileCreate(at assembliesDir:Folder) throws {
-        let file = try assemblyFileCreate(named: assemblyCoordName, at: assembliesDir)
-
+        guard let file = coordAssFile else { throw ProjectStructureError.localError("No FiLE \(coordAssFile?.name) 0_0???") }
         TextFunc.insert("2222", into: file)
-    }
-
-    fileprivate func assemblyFileCreate(named:String, at assembliesDir:Folder) throws -> File {
-        let assemblyFileName = named + swiftExtension
-        return try assembliesDir.createFileIfNeeded(withName: assemblyFileName)
     }
 }
 

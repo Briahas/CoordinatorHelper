@@ -14,9 +14,9 @@ enum State {
 }
 
 class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate, NSTableViewDataSource {
-    fileprivate let sourceFolderName = "Source"
-    fileprivate let flowFolderName = "Flow"
-    fileprivate let logicFolderName = "Logic"
+//    fileprivate let sourceFolderName = "Source"
+//    fileprivate let flowFolderName = "Flow"
+//    fileprivate let logicFolderName = "Logic"
     
     @IBOutlet weak var tableView: NSTableView!
     @IBOutlet weak var infoView: NSView!
@@ -32,12 +32,11 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
     @IBOutlet weak var scanninDiskIndocator: NSProgressIndicator!
 
     
-    fileprivate let scaner = DiskScaner()
+    fileprivate let dickScaner = DiskScaner()
+    fileprivate var projectStructure: ProjectStructure?
     fileprivate var projects: [Folder] = []
     fileprivate var selectedFolder: Folder?
-    fileprivate var allFlowsDir: Folder?
-    fileprivate var coordAssFile: File?
-    fileprivate var screenAssFile: File?
+
     
     fileprivate var state = State.initial {
         didSet { repformState() }
@@ -65,74 +64,50 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
     }
     
     @IBAction func fixProjectStructure(_ sender: NSButton) {
-        guard
-            let folder = selectedFolder,
-            let sub = try? folder.subfolder(named: folder.name)
-            else { return }
-
-        let sourceDir = try? sub.createSubfolder(named: sourceFolderName)
-        let flowDir = try? sourceDir?.createSubfolder(named: flowFolderName)
-        let logicDir = try? sourceDir?.createSubfolder(named: logicFolderName)
+        guard let projectStructure = self.projectStructure else { return }
         
+        do { try projectStructure.performCorrection() }
+        catch { print(error.localizedDescription) }
     }
     
     @IBAction func addFlow(_ sender: NSButton) {
-        state = .flowAddingStart
-        
-        let flowName = flowNameTextField.stringValue
-        guard
-            flowName.count > 0,
-            let allFlowsDir = allFlowsDir,
-            let fileC = coordAssFile,
-            let fileS = screenAssFile
-            else { state = .flowAdding(result:false); return }
-        
-        let managerAssemblies = Assemblies(coordinatorAssemblyFile: fileC,
-                                                  screenAssemblyFile: fileS)
-        managerAssemblies.addCoordinator(with:flowName)
-
-        let managerFlows = Flows(in: allFlowsDir)
-        managerFlows.create(flow: flowName) { state = .flowAdding(result:$0); return }
+//        state = .flowAddingStart
+//
+//        let flowName = flowNameTextField.stringValue
+//        guard
+//            flowName.count > 0,
+//            let allFlowsDir = allFlowsDir,
+//            let fileC = coordAssFile,
+//            let fileS = screenAssFile
+//            else { state = .flowAdding(result:false); return }
+//
+//        let managerAssemblies = Assemblies(coordinatorAssemblyFile: fileC,
+//                                                  screenAssemblyFile: fileS)
+//        managerAssemblies.addCoordinator(with:flowName)
+//
+//        let managerFlows = Flows(in: allFlowsDir)
+//        managerFlows.create(flow: flowName) { state = .flowAdding(result:$0); return }
         
     }
     
     // MARK: - Private
     // MARK: Analyzing
     fileprivate func analyseSelected(_ folder:Folder) {
-        #warning MUST BE PLACED IN TO ProjectStructure
-        self.allFlowsDir = nil
-        self.coordAssFile = nil
-        self.screenAssFile = nil
         self.selectedFolder = folder
 
-        guard
-            let sub1 = try? folder.subfolder(named: folder.name),
-            let sourceDir = try? sub1.subfolder(named: sourceFolderName),
-            let flowDir = try? sourceDir.subfolder(named: flowFolderName),
-            let logicDir = try? sourceDir.subfolder(named: logicFolderName),
-            let coordAssFile = try? logicDir.file(named: "AssemblyCoordinator.swift"),
-            let screenAssFile = try? logicDir.file(named: "AssemblyScreen.swift")
-            else {
-                state = .initial
-                return
+        do {
+            let projectStructure = try ProjectStructure(with: folder)
+            state = projectStructure.isCorrect ? .correctStructure : .initial
+            self.projectStructure = projectStructure
         }
-        
-        state = .correctStructure
-        self.allFlowsDir = flowDir
-        self.coordAssFile = coordAssFile
-        self.screenAssFile = screenAssFile
+        catch let error as ProjectStructureError { print(error) }
+        catch { print(error.localizedDescription) }
     }
 
     fileprivate func analyseEntered(_ name:String) {
-        guard
-            let folder = allFlowsDir,
-            folder.containsSubfolder(named: name)
-            else  {
-                state = .correctStructure
-                return
-        }
-        
-        state = .correctFlowName
+        guard let projectStructure = self.projectStructure else { return }
+
+        state = projectStructure.isCorrectCoordinator(name) ? .correctFlowName : .correctStructure
     }
     // MARK: State
     fileprivate func repformState() {
@@ -157,7 +132,6 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
     }
 
     fileprivate func setupCorrectStructureUI() {
-        let enable = true
         correctProjectStructureLabel.stringValue = "correct"
         flowDirFixButton.isEnabled = false
         flowAddView.isHidden = false
@@ -186,7 +160,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
     // MARK: reload
     fileprivate func reloadProjectList() {
         state = .initial
-        scaner.projects().then { (data) -> Void in
+        dickScaner.projects().then { (data) -> Void in
             self.projects = data
             self.tableView.reloadData()
         }

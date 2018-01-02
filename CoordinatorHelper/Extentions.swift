@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Files
 
 extension NSTextField {
     open override var isEnabled: Bool {
@@ -29,5 +30,23 @@ extension String {
     }
     mutating func lowercaseFirstLetter() {
         self = self.lowercasingFirstLetter()
+    }
+}
+
+extension Folder {
+    func subfolder(named:String, withCreation:Bool = false) throws -> Folder {
+        if withCreation {
+            return try self.createSubfolderIfNeeded(withName:named)
+        } else {
+            return try self.subfolder(named:named)
+        }
+    }
+
+    func file(named:String, withCreation:Bool = false) throws -> File {
+        if withCreation {
+            return try self.createFileIfNeeded(withName:named)
+        } else {
+            return try self.file(named:named)
+        }
     }
 }
