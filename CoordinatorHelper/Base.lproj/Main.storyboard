@@ -763,7 +763,7 @@
                                     <font key="font" metaFont="system"/>
                                 </buttonCell>
                                 <connections>
-                                    <action selector="addFlow:" target="XfG-lQ-9wD" id="Tgi-VJ-4yo"/>
+                                    <action selector="refresh:" target="XfG-lQ-9wD" id="wtN-AB-HO3"/>
                                 </connections>
                             </button>
                             <customView translatesAutoresizingMaskIntoConstraints="NO" id="EJe-UV-4eP">

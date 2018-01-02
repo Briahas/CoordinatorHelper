@@ -3,7 +3,7 @@
 //  CoordinatorHelper
 //
 //  Created by Mike Kholomeev on 12/14/17.
-//  Copyright © 2017 NixSolutions. All rights reserved.
+//  Copyright © 2017 Mike Kholomeev. All rights reserved.
 //
 
 import Foundation

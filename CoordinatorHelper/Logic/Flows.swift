@@ -1,16 +1,16 @@
 //
-//  ManagerFlow.swift
+//  Flows.swift
 //  CoordinatorHelper
 //
 //  Created by Mike Kholomeev on 12/15/17.
-//  Copyright © 2017 NixSolutions. All rights reserved.
+//  Copyright © 2017 Mike Kholomeev. All rights reserved.
 //
 
 import Foundation
 import Files
 import PromiseKit
 
-class ManagerFlow {
+class Flows {
     fileprivate let swiftExtention = "swift"
     fileprivate let storyboardExtention = "storyboard"
     

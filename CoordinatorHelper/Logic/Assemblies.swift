@@ -1,17 +1,15 @@
 //
-//  OperatorCoordAss.swift
+//  Assemblies.swift
 //  CoordinatorHelper
 //
 //  Created by Mike Kholomeev on 12/14/17.
-//  Copyright © 2017 NixSolutions. All rights reserved.
+//  Copyright © 2017 Mike Kholomeev. All rights reserved.
 //
 
 import Foundation
 import Files
 
-class ManagerAssemblies {
-    let parser = Parser()
-
+class Assemblies {
     let coordinatorAssemblyFile:File
     let screenAssemblyFile:File
 
@@ -24,30 +22,13 @@ class ManagerAssemblies {
         let insertedCoordinatorText = coordinatorText(with: name)
         let insertedScreenText = screenText(with: name)
 
-        insert(insertedCoordinatorText,
-               into: coordinatorAssemblyFile)
-        insert(insertedScreenText,
-               into: screenAssemblyFile)
+        TextFunc.insert(insertedCoordinatorText,
+                        into: coordinatorAssemblyFile)
+        TextFunc.insert(insertedScreenText,
+                        into: screenAssemblyFile)
     }
     
     // MARK: - Private
-    fileprivate func insert(_ text:String, into file:File) {
-        guard
-            let content = try? file.readAsString(),
-            let index = parser.lastPosition(for: "}", at: content)
-            else { return}
-        
-        var newContent = content
-        let insertedIndex = content.index(before: index)
-        newContent.insert(contentsOf:text, at: insertedIndex)
-        
-        do {
-            try file.write(string: newContent)
-        } catch {
-            print(error)
-        }
-    }
-
     fileprivate func coordinatorText(with name:String) -> String {
         let smallName = name.lowercasingFirstLetter()
         let bigName = name.capitalizingFirstLetter()
