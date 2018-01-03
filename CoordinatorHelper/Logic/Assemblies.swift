@@ -18,20 +18,19 @@ class Assemblies {
         self.screenAssemblyFile = screenAssemblyFile
     }
 
-    func addCoordinator(with name:String) {
-        let insertedCoordinatorText = coordinatorText(with: name)
-        let insertedScreenText = screenText(with: name)
+    // MARK: - Public
+    func addCoordinatorScreenCreation(named:String) throws {
+        let insertedCoordinatorText = textCreationCoordinator(named)
+        let insertedScreenText = textCreationScreen(named)
 
-        TextFunc.insert(insertedCoordinatorText,
-                        into: coordinatorAssemblyFile)
-        TextFunc.insert(insertedScreenText,
-                        into: screenAssemblyFile)
+        try TextFunc.insert(insertedCoordinatorText, into: coordinatorAssemblyFile)
+        try TextFunc.insert(insertedScreenText, into: screenAssemblyFile)
     }
     
     // MARK: - Private
-    fileprivate func coordinatorText(with name:String) -> String {
-        let smallName = name.lowercasingFirstLetter()
-        let bigName = name.capitalizingFirstLetter()
+    fileprivate func textCreationCoordinator(_ named:String) -> String {
+        let smallName = named.lowercasingFirstLetter()
+        let bigName = named.capitalizingFirstLetter()
         
         let importText = """
         //MARK - \(bigName)Coordinator
@@ -45,9 +44,9 @@ class Assemblies {
         return importText
     }
     
-    fileprivate func screenText(with name:String) -> String {
-        let smallName = name.lowercasingFirstLetter()
-        let bigName = name.capitalizingFirstLetter()
+    fileprivate func textCreationScreen(_ named:String) -> String {
+        let smallName = named.lowercasingFirstLetter()
+        let bigName = named.capitalizingFirstLetter()
         
         let importText = """
         //MARK - \(bigName)Screen

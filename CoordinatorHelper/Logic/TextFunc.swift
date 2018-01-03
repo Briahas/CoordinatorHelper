@@ -10,7 +10,7 @@ import Foundation
 import Files
 
 class TextFunc {
-    class func insert(_ text:String, into file:File) {
+    class func insert(_ text:String, into file:File, before symbol:String = "}") throws {
         let parser = Parser()
         
         guard
@@ -22,10 +22,12 @@ class TextFunc {
         let insertedIndex = content.index(before: index)
         newContent.insert(contentsOf:text, at: insertedIndex)
         
-        do {
-            try file.write(string: newContent)
-        } catch {
-            print(error)
-        }
+        try file.write(string: newContent)
+    }
+    
+    class func insert(_ text:String, into file:File, insteadOf string:String) throws {
+        let content = try file.readAsString()
+        let newContent = content.replacingOccurrences(of: string, with: text)
+        try file.write(string: newContent)
     }
 }

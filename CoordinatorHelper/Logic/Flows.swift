@@ -13,6 +13,8 @@ import PromiseKit
 class Flows {
     fileprivate let swiftExtention = "swift"
     fileprivate let storyboardExtention = "storyboard"
+    fileprivate let appFlowName = "App"
+    fileprivate let mainFlowName = "Main"
     
     fileprivate let allFlowsDir:Folder
     fileprivate var flowName = ""
@@ -22,16 +24,21 @@ class Flows {
     }
     
     // MARK: - Public
-    func create(flow name:String, complition:(Bool)->()) {
+    func create(flow name:String) throws {
         flowName = name
         guard
-            flowName.count > 0,
-            let folder = try? allFlowsDir.createSubfolder(named: bigName),
-            let _ = try? folder.createFile(named: coordFileFullName, contents: coordinatorText()),
-            let _ = try? folder.createFile(named: vcFileFullName, contents: vcText())
-            else { return complition(false) }
-        
-        return complition(true)
+            flowName.count > 0
+            else { throw AppError.EmptyName }
+        let folder = try allFlowsDir.createSubfolder(named: bigName)
+        try folder.createFile(named: coordFileFullName, contents: coordinatorText)
+        try folder.createFile(named: vcFileFullName, contents: vcText)
+    }
+    
+    func createInitialFlows() throws {
+        flowName = appFlowName
+        let appFolder = try allFlowsDir.createSubfolder(named: bigName)
+        try appFolder.createFile(named: coordFileFullName, contents: appCoordinatorText)
+        try create(flow: mainFlowName)
     }
     
     // MARK: - Private
@@ -48,7 +55,51 @@ class Flows {
         return bigName + "Screen" + "." + swiftExtention
     }
     
-    fileprivate func coordinatorText() -> String {
+    fileprivate var appCoordinatorText:String {
+        let importText = """
+        import Foundation
+
+        enum AppState {
+            case main
+        }
+
+        final class AppCoordinator: BaseCoordinator, Coordinator {
+            fileprivate let router: Router
+            fileprivate let assembly: AssemblyCoordinator
+            
+            fileprivate var state: AppState
+            
+            init(_ router: Router, _ assembly: AssemblyCoordinator) {
+                self.router = router
+                self.assembly = assembly
+                state = .main
+            }
+            
+            func start() {
+                switch state {
+                case .main:
+                    runMainFlow()
+                }
+            }
+            
+            fileprivate func runMainFlow() {
+                let mainCoordinator = assembly.mainCoordinator
+                addDependency(mainCoordinator)
+                
+                mainCoordinator.finishFlow = { [weak self, weak mainCoordinator] item in
+                    self?.router.dismissTopScreen()
+                    self?.removeDependency(mainCoordinator)
+                    self?.start()
+                }
+                
+                mainCoordinator.start()
+            }
+        }
+        """
+        return importText
+    }
+    
+    fileprivate var coordinatorText:String {
         let importText = """
         //
         //  \(bigName)Coordinator.swift
@@ -61,7 +112,7 @@ class Flows {
         import Foundation
         import UIKit
 
-        class \(bigName)Coordinator: BaseCoordinator, Coordinator, CoordinatorOutput, \(bigName)CoordinatorDelegate {
+        class \(bigName)Coordinator: BaseCoordinator, Coordinator, CoordinatorOutput, \(bigName)ScreenDelegate {
         
             var finishFlow: ((Any) -> Void)?
         
@@ -97,7 +148,7 @@ class Flows {
         return importText
     }
     
-    fileprivate func vcText() -> String {
+    fileprivate var vcText:String {
         let importText = """
         //
         //  \(bigName)Screen.swift
@@ -110,13 +161,13 @@ class Flows {
         import Foundation
         import UIKit
 
-        protocol \(bigName)CoordinatorDelegate {
+        protocol \(bigName)ScreenDelegate {
             func didCloseScreen()
         }
 
         class \(bigName)Screen: UIViewController {
         
-            var delegate: \(bigName)CoordinatorDelegate?
+            var delegate: \(bigName)ScreenDelegate?
         
             @IBOutlet weak var sendButton: UIButton!
             @IBOutlet weak var textLabel: UILabel!

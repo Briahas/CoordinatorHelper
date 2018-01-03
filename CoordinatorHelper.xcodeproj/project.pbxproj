@@ -19,6 +19,7 @@
 		9EBA0C901FE3D2A40007F079 /* Flows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EBA0C8F1FE3D2A40007F079 /* Flows.swift */; };
 		9EDBB3611FE2D4760087DECD /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EDBB3601FE2D4760087DECD /* Parser.swift */; };
 		9EDBB3631FE2E1380087DECD /* Assemblies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EDBB3621FE2E1380087DECD /* Assemblies.swift */; };
+		9EEAF12D1FFD093600BECD70 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEAF12C1FFD093600BECD70 /* AppError.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,7 @@
 		9EBA0C8F1FE3D2A40007F079 /* Flows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Flows.swift; sourceTree = "<group>"; };
 		9EDBB3601FE2D4760087DECD /* Parser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
 		9EDBB3621FE2E1380087DECD /* Assemblies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Assemblies.swift; sourceTree = "<group>"; };
+		9EEAF12C1FFD093600BECD70 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +112,7 @@
 				9EDBB3601FE2D4760087DECD /* Parser.swift */,
 				9EDBB3621FE2E1380087DECD /* Assemblies.swift */,
 				9EBA0C8F1FE3D2A40007F079 /* Flows.swift */,
+				9EEAF12C1FFD093600BECD70 /* AppError.swift */,
 				9E82EC6E1FFB8F2300D3E3CE /* ProjectStructure.swift */,
 				9E82EC701FFBC24200D3E3CE /* TextFunc.swift */,
 			);
@@ -255,6 +258,7 @@
 			files = (
 				9E82EC711FFBC24200D3E3CE /* TextFunc.swift in Sources */,
 				9E03C0741FE1247200B436D7 /* ViewController.swift in Sources */,
+				9EEAF12D1FFD093600BECD70 /* AppError.swift in Sources */,
 				9E03C0721FE1247200B436D7 /* AppDelegate.swift in Sources */,
 				9EDBB3611FE2D4760087DECD /* Parser.swift in Sources */,
 				9EDBB3631FE2E1380087DECD /* Assemblies.swift in Sources */,

@@ -66,28 +66,27 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
     @IBAction func fixProjectStructure(_ sender: NSButton) {
         guard let projectStructure = self.projectStructure else { return }
         
-        do { try projectStructure.performCorrection() }
-        catch { print(error.localizedDescription) }
+        do {
+            try projectStructure.performCorrection()
+            state = .flowAdding(result:true)
+        } catch {
+            state = .flowAdding(result:false)
+        }
     }
-    
     @IBAction func addFlow(_ sender: NSButton) {
-//        state = .flowAddingStart
-//
-//        let flowName = flowNameTextField.stringValue
-//        guard
-//            flowName.count > 0,
-//            let allFlowsDir = allFlowsDir,
-//            let fileC = coordAssFile,
-//            let fileS = screenAssFile
-//            else { state = .flowAdding(result:false); return }
-//
-//        let managerAssemblies = Assemblies(coordinatorAssemblyFile: fileC,
-//                                                  screenAssemblyFile: fileS)
-//        managerAssemblies.addCoordinator(with:flowName)
-//
-//        let managerFlows = Flows(in: allFlowsDir)
-//        managerFlows.create(flow: flowName) { state = .flowAdding(result:$0); return }
+        state = .flowAddingStart
+        let flowName = flowNameTextField.stringValue
+        guard
+            flowName.count > 0,
+            let projectStructure = self.projectStructure
+            else { state = .flowAdding(result:false); return }
         
+        do {
+            try projectStructure.add(coordinator:flowName)
+            state = .flowAdding(result:true)
+        } catch {
+            state = .flowAdding(result:false)
+        }
     }
     
     // MARK: - Private
@@ -107,8 +106,9 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
     fileprivate func analyseEntered(_ name:String) {
         guard let projectStructure = self.projectStructure else { return }
 
-        state = projectStructure.isCorrectCoordinator(name) ? .correctFlowName : .correctStructure
+        state = projectStructure.isValidCoordinator(name) ? .correctFlowName : .correctStructure
     }
+    
     // MARK: State
     fileprivate func repformState() {
         switch state {
