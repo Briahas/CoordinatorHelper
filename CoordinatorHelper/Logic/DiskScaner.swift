@@ -38,26 +38,28 @@ class DiskScaner {
     func projects() -> Promise<[Folder]> {
         var urls:[Folder] = []
         let start = CACurrentMediaTime()
+        let disk = FileManager.default
 
         guard
-            let url = self.documentDirURL,
-            let folder = try? Folder(path:url.path)
-            else { return Promise { fulfill, _ in
-                fulfill(urls)
-                }}
+            let url = self.documentDirURL
+            else { return Promise { fulfill, _ in fulfill(urls) }
+        }
 
         let promise = Promise<[Folder]> { fulfill, _ in
-//            DispatchQueue.global().async {
-//            }
-            folder.makeSubfolderSequence(recursive: true).forEach { folder in
-                let list = folder.subfolders.filter({
-                    $0.extension == self.projectExtention && $0.nameExcludingExtension != self.excludeProject
-                }).sorted(by: { $0.modificationDate > $1.modificationDate }).flatMap { $0.parent }
-                urls += list
+            let queue = OperationQueue()
+
+            queue.addOperation {
+                guard let files = try? disk.subpathsOfDirectory(atPath: url.path) else {return}
+                let list = files
+                    .filter({ $0.hasSuffix(self.projectExtention) && !($0.contains(self.excludeProject) || $0.contains("Vendor")) })
+                    .map({ url.appendingPathComponent($0).deletingLastPathComponent().path })
+                    .flatMap({ try? Folder(path:$0) })
+                urls = list
             }
-            
+
+            queue.waitUntilAllOperationsAreFinished()
             print(CACurrentMediaTime()-start)
-            
+
             fulfill(urls)
         }
         

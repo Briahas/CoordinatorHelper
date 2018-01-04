@@ -29,5 +29,6 @@ class TextFunc {
         let content = try file.readAsString()
         let newContent = content.replacingOccurrences(of: string, with: text)
         try file.write(string: newContent)
+        
     }
 }

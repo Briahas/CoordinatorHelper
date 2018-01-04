@@ -20,6 +20,7 @@
 		9EDBB3611FE2D4760087DECD /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EDBB3601FE2D4760087DECD /* Parser.swift */; };
 		9EDBB3631FE2E1380087DECD /* Assemblies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EDBB3621FE2E1380087DECD /* Assemblies.swift */; };
 		9EEAF12D1FFD093600BECD70 /* AppError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEAF12C1FFD093600BECD70 /* AppError.swift */; };
+		9EEAF22E1FFE63A800BECD70 /* ProjectImporter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EEAF22D1FFE63A800BECD70 /* ProjectImporter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,7 @@
 		9EDBB3601FE2D4760087DECD /* Parser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
 		9EDBB3621FE2E1380087DECD /* Assemblies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Assemblies.swift; sourceTree = "<group>"; };
 		9EEAF12C1FFD093600BECD70 /* AppError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppError.swift; sourceTree = "<group>"; };
+		9EEAF22D1FFE63A800BECD70 /* ProjectImporter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectImporter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,13 +110,14 @@
 		9E03C0811FE1266F00B436D7 /* Logic */ = {
 			isa = PBXGroup;
 			children = (
+				9EEAF12C1FFD093600BECD70 /* AppError.swift */,
 				9E03C0841FE126BE00B436D7 /* DiskScaner.swift */,
 				9EDBB3601FE2D4760087DECD /* Parser.swift */,
 				9EDBB3621FE2E1380087DECD /* Assemblies.swift */,
 				9EBA0C8F1FE3D2A40007F079 /* Flows.swift */,
-				9EEAF12C1FFD093600BECD70 /* AppError.swift */,
 				9E82EC6E1FFB8F2300D3E3CE /* ProjectStructure.swift */,
 				9E82EC701FFBC24200D3E3CE /* TextFunc.swift */,
+				9EEAF22D1FFE63A800BECD70 /* ProjectImporter.swift */,
 			);
 			path = Logic;
 			sourceTree = "<group>";
@@ -264,6 +267,7 @@
 				9EDBB3631FE2E1380087DECD /* Assemblies.swift in Sources */,
 				9EBA0C901FE3D2A40007F079 /* Flows.swift in Sources */,
 				9E82EC6F1FFB8F2300D3E3CE /* ProjectStructure.swift in Sources */,
+				9EEAF22E1FFE63A800BECD70 /* ProjectImporter.swift in Sources */,
 				9E03C0871FE1ACF700B436D7 /* Extentions.swift in Sources */,
 				9E03C0851FE126BE00B436D7 /* DiskScaner.swift in Sources */,
 			);

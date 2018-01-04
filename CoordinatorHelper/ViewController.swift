@@ -39,7 +39,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
 
     
     fileprivate var state = State.initial {
-        didSet { repformState() }
+        didSet { performState() }
     }
     
     override func viewDidLoad() {
@@ -68,9 +68,9 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
         
         do {
             try projectStructure.performCorrection()
-            state = .flowAdding(result:true)
+            analyseStructure(for:selectedFolder!)
         } catch {
-            state = .flowAdding(result:false)
+            state = .initial
         }
     }
     @IBAction func addFlow(_ sender: NSButton) {
@@ -91,9 +91,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
     
     // MARK: - Private
     // MARK: Analyzing
-    fileprivate func analyseSelected(_ folder:Folder) {
-        self.selectedFolder = folder
-
+    fileprivate func analyseStructure(for folder:Folder) {
         do {
             let projectStructure = try ProjectStructure(with: folder)
             state = projectStructure.isCorrect ? .correctStructure : .initial
@@ -110,7 +108,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
     }
     
     // MARK: State
-    fileprivate func repformState() {
+    fileprivate func performState() {
         switch state {
         case .initial:
             setupInitialUI()
@@ -189,7 +187,8 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
     func tableViewSelectionDidChange(_ notification: Notification) {
         let row = tableView.selectedRow
         let folder = projects[row]
-        analyseSelected(folder)
+        self.selectedFolder = folder
+        analyseStructure(for:folder)
     }
 }
 
