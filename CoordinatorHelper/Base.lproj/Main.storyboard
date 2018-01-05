@@ -832,7 +832,7 @@
                                         </constraints>
                                     </customView>
                                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Bch-6F-26O">
-                                        <rect key="frame" x="123" y="188" width="37" height="17"/>
+                                        <rect key="frame" x="123" y="187" width="37" height="17"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Label" id="tyM-5F-nqb">
                                             <font key="font" metaFont="system"/>
                                             <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
@@ -840,8 +840,8 @@
                                         </textFieldCell>
                                     </textField>
                                     <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="VS3-PP-KJv">
-                                        <rect key="frame" x="286" y="179" width="75" height="32"/>
-                                        <buttonCell key="cell" type="push" title="Fix" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Ct8-2d-ZrN">
+                                        <rect key="frame" x="286" y="178" width="75" height="32"/>
+                                        <buttonCell key="cell" type="push" title="Insert" bezelStyle="rounded" alignment="center" enabled="NO" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Ct8-2d-ZrN">
                                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="system"/>
                                         </buttonCell>

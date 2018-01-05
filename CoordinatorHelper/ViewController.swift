@@ -10,7 +10,7 @@ import Cocoa
 import Files
 
 enum State {
-    case initial, correctStructure, correctFlowName, flowAddingStart, flowAdding(result: Bool)
+    case initial, correctStructure, incorrectFlowName, correctFlowName, flowAddingStart, flowAdding(result: Bool)
 }
 
 class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate, NSTableViewDataSource {
@@ -94,8 +94,8 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
     fileprivate func analyseStructure(for folder:Folder) {
         do {
             let projectStructure = try ProjectStructure(with: folder)
-            state = projectStructure.isCorrect ? .correctStructure : .initial
             self.projectStructure = projectStructure
+            state = projectStructure.isCorrect ? .correctStructure : .initial
         }
         catch let error as ProjectStructureError { print(error) }
         catch { print(error.localizedDescription) }
@@ -104,7 +104,7 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
     fileprivate func analyseEntered(_ name:String) {
         guard let projectStructure = self.projectStructure else { return }
 
-        state = projectStructure.isValidCoordinator(name) ? .correctFlowName : .correctStructure
+        state = projectStructure.isValidCoordinator(name) ? .correctFlowName : .incorrectFlowName
     }
     
     // MARK: State
@@ -114,12 +114,15 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
             setupInitialUI()
         case .correctStructure:
             setupCorrectStructureUI()
+            analyseEntered(flowNameTextField.stringValue)
+        case .incorrectFlowName:
+            setupIncorrectFlowNameUI()
         case .correctFlowName:
             setupCorrectFlowNameUI()
         case .flowAddingStart:
             setupFlowAddingStart()
         case .flowAdding(let result):
-            setupFlowAdding(result)
+            setupFlowAddingResult(result)
         }
     }
 // MARK: Setup State UI
@@ -134,9 +137,16 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
         flowDirFixButton.isEnabled = false
         flowAddView.isHidden = false
         flowAddButton.isEnabled = false
+        addinFlowResultTextField.isHidden = true
         flowNameTextField.becomeFirstResponder()
     }
     
+    fileprivate func setupIncorrectFlowNameUI() {
+        flowAddButton.isEnabled = false
+        addinFlowResultTextField.isHidden = true
+        addinFlowIndocator.stopAnimation(nil)
+    }
+
     fileprivate func setupCorrectFlowNameUI() {
         flowAddButton.isEnabled = true
         addinFlowResultTextField.isHidden = true
@@ -147,12 +157,12 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
         addinFlowResultTextField.isHidden = true
         addinFlowIndocator.startAnimation(nil)
     }
-    fileprivate func setupFlowAdding(_ result:Bool) {
-        flowAddButton.isEnabled = true
-        addinFlowResultTextField.isHidden = false
+    fileprivate func setupFlowAddingResult(_ result:Bool) {
         addinFlowIndocator.stopAnimation(nil)
 
+        addinFlowResultTextField.isHidden = false
         addinFlowResultTextField.stringValue = result ? "Success" : "Failure"
+        flowAddButton.isEnabled = result ? false : true
     }
 
     // MARK: reload

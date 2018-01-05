@@ -98,7 +98,7 @@ class ProjectStructure {
     func isValidCoordinator(_ name:String) -> Bool {
         guard
             let parrent = coordinatorsFolder,
-            parrent.containsSubfolder(named: name)
+            parrent.containsSubfolder(named: name.capitalizingFirstLetter())
             else { return true }
         
         return false
