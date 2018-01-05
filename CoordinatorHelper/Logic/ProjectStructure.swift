@@ -69,13 +69,12 @@ class ProjectStructure {
 
     // MARK: - Public
     var isCorrect: Bool {
-        guard let _ = try? analyzeWith(creation: false) else { return false }
-        
-        return true
+        return (try? analyze()) ?? false
     }
     
     func performCorrection() throws {
-        try analyzeWith(creation: true)
+        try createCorrectStructure()
+        
         guard let coordsDir = coordinatorsFolder else { throw AppError.NoFiles }
         try routerFile?.write(string: routerText)
         try baseCoordinatorFile?.write(string: baseCoordinatorText)
@@ -119,7 +118,14 @@ class ProjectStructure {
     }
     
     // MARK: - Private
-    fileprivate func analyzeWith(creation:Bool) throws {
+    fileprivate func analyze() throws -> Bool {
+        return try analyzeWith(creation: false)
+    }
+    fileprivate func createCorrectStructure() throws -> Bool {
+        return try analyzeWith(creation: true)
+    }
+    
+    fileprivate func analyzeWith(creation:Bool) throws -> Bool {
         let projectFolder = try mainDir.subfolder(named:projectName, withCreation:creation)
         let sourceDir = try projectFolder.subfolder(named:sourceFolderName, withCreation:creation)
         let coordDir = try sourceDir.subfolder(named:coordinatorsFolderName, withCreation:creation)
@@ -149,6 +155,8 @@ class ProjectStructure {
         self.baseCoordinatorFolder = baseCoordinatorDir
         self.baseCoordinatorFile = baseCoordinatorFile
         self.protocolCoordinatorFile = protocolCoordinatorFile
+        
+        return true
     }
 
     // MARK: - texts
