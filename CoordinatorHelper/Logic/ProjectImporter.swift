@@ -2,8 +2,8 @@
 //  ProjectManipulator.swift
 //  CoordinatorHelper
 //
-//  Created by Mike Kholomeev on 1/4/18.
-//  Copyright © 2018 NixSolutions. All rights reserved.
+//  Created by anconaesselmann, modified by Mike Kholomeev on 1/4/18.
+//  Copyright © 2018 Mike Kholomeev. All rights reserved.
 //
 
 import Foundation
@@ -35,10 +35,12 @@ class ProjectImporter {
     }
     
     class XcodeFolder: XcodeEntry {
+        let url: URL
         let files: [XcodeEntry]
         let subFolders: [XcodeFolder]
         
         init(url: URL) {
+            self.url = url
             let folder = try? Folder(path: url.path)
             self.files = folder?.files.flatMap({ XcodeEntry(name: $0.name) }) ?? []
             self.subFolders = folder?.subfolders.flatMap({
@@ -242,7 +244,10 @@ class ProjectImporter {
             
             switch xcodeSection {
             case .pbxGroup:
-                if line.hasSuffix("/* \(projectName) */ = {") {
+                guard let folder = folders.first else { continue }
+                let parrentDirName = folder.url.deletingLastPathComponent().lastPathComponent
+                
+                if line.hasSuffix("/* \(parrentDirName) */ = {") {
                     matchingConditions += 1
                 } else if matchingConditions > 0 && line.hasSuffix("children = (") {
                     matchingConditions += 1

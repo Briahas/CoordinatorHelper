@@ -114,7 +114,10 @@ class ProjectStructure {
         let managerAssemblies = Assemblies(coordinatorAssemblyFile: fileC,
                                            screenAssemblyFile: fileS)
         try managerAssemblies.addCoordinatorScreenCreation(named:name)
-        try Flows(in: allFlowsDir).create(flow: name)
+        let flowFolder = try Flows(in: allFlowsDir).create(flow: name)
+        let mainDirURL = URL(fileURLWithPath: mainDir.path, isDirectory: true)
+        let flowDirURL = URL(fileURLWithPath: flowFolder.path, isDirectory: true)
+        ProjectImporter(projectDirURL: mainDirURL, importedDirURL: flowDirURL).importFilesIntoProject()
     }
     
     // MARK: - Private
@@ -356,7 +359,7 @@ class ProjectStructure {
 
         class AssemblyScreen {
 
-            func mainScreen(delegate:MainCoordinator) -> MainScreen {
+            func mainScreen(delegate: MainScreenDelegate) -> MainScreen {
                 let vc = MainScreen.instantiateFromStoryboard()
                 vc.delegate = delegate
                 return vc

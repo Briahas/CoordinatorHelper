@@ -79,8 +79,8 @@
 			children = (
 				9E03C0701FE1247200B436D7 /* CoordinatorHelper */,
 				9E03C06F1FE1247200B436D7 /* Products */,
-				4696251F0B03D591E2F0B245 /* Pods */,
 				576791F3AA622504E61D86A9 /* Frameworks */,
+				4696251F0B03D591E2F0B245 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};

@@ -24,7 +24,7 @@ class Flows {
     }
     
     // MARK: - Public
-    func create(flow name:String) throws {
+    func create(flow name:String) throws -> Folder{
         flowName = name
         guard
             flowName.count > 0
@@ -33,12 +33,14 @@ class Flows {
         try folder.createFile(named: coordFileFullName, contents: coordinatorText)
         try folder.createFile(named: vcFileFullName, contents: vcText)
         try folder.createFile(named: storyboardFileFullName, contents: vcStoryboard)
+        
+        return folder
     }
     
     func createInitialFlows() throws {
         flowName = appFlowName
-        let appFolder = try allFlowsDir.createSubfolder(named: bigName)
-        try appFolder.createFile(named: coordFileFullName, contents: appCoordinatorText)
+        let flowFolder = try allFlowsDir.createSubfolder(named: bigName)
+        try flowFolder.createFile(named: coordFileFullName, contents: appCoordinatorText)
         try create(flow: mainFlowName)
     }
     

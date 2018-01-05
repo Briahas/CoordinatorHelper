@@ -186,6 +186,8 @@ class ViewController: NSViewController, NSTextFieldDelegate, NSTableViewDelegate
     
     func tableViewSelectionDidChange(_ notification: Notification) {
         let row = tableView.selectedRow
+        guard row > 0 && row <= projects.count else { return }
+        
         let folder = projects[row]
         self.selectedFolder = folder
         analyseStructure(for:folder)
