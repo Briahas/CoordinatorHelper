@@ -267,20 +267,18 @@ class ProjectStructure {
             }
             
             func presentModaly(_ vc:UIViewController, sourceView:UIView? = nil, barButtonItem:UIBarButtonItem? = nil, animated:Bool = true)  {
-                vc.modalPresentationStyle = UIModalPresentationStyle.popover
-                
-                // set up the popover presentation controller
-                vc.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection.init(rawValue: 0)
-                vc.popoverPresentationController?.delegate = self
-                if let barItem = barButtonItem {
-                    vc.popoverPresentationController?.barButtonItem = barItem
-                } else if let view = sourceView {
-                    vc.popoverPresentationController?.sourceView = view
-                } else {
-                    assertionFailure("Not specified sourceView or barButtonItem for menu popover")
+                if (sourceView != nil || barButtonItem != nil) {
+                    // set up presentation controller for Popover style
+                    vc.modalPresentationStyle = UIModalPresentationStyle.popover
+                    vc.popoverPresentationController?.permittedArrowDirections = UIPopoverArrowDirection.init(rawValue: 0)
+                    vc.popoverPresentationController?.delegate = self
+                    if let barItem = barButtonItem {
+                        vc.popoverPresentationController?.barButtonItem = barItem
+                    } else if let view = sourceView {
+                        vc.popoverPresentationController?.sourceView = view
+                    }
                 }
-                
-                // present the popover
+
                 modalVC = vc
                 navController.present(vc, animated: animated, completion: {
                     vc.view.superview?.layer.cornerRadius = 4
